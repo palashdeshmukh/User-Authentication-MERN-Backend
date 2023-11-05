@@ -1,3 +1,4 @@
+require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const cors = require('cors');
 const  bodyParser = require('body-parser');
@@ -12,10 +13,11 @@ const port = 8082;
 server.use(cors());
 server.use(express.json());
 
-mongoose.connect('mongodb://127.0.0.1:27017/LoginID', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
+
 
 
 const userSchema = new mongoose.Schema({
