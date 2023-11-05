@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -16,7 +16,7 @@
     "gitignore": "^0.7.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
-    "mongoose": "^8.0.0",
+    "mongoose": "^6.10.1",
     "morgan": "~1.9.1"
   }
 }
