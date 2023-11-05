@@ -1,13 +1,9 @@
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const path = require('path');
 const server = express();
-
-// Use the PORT environment variable provided by Render or default to 8082
 const port = process.env.PORT || 8082;
 
 server.use(cors());
@@ -15,62 +11,53 @@ server.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 });
 
 const userSchema = new mongoose.Schema({
   username: String,
-  password: String
+  password: String,
 });
 
 const User = mongoose.model('User', userSchema);
 
 server.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-
-  // Check if the username already exists in the database
-  const existingUser = await User.findOne({ username });
-  if (existingUser) {
-    return res.status(400).json({ error: 'Username already in use' });
-  }
-
-  // If the username is not in use, proceed with registration
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = new User({
-    username,
-    password: hashedPassword
-  });
-
   try {
+    const { username, password } = req.body;
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'Username already in use' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      username,
+      password: hashedPassword,
+    });
+
     const savedUser = await user.save();
     res.json(savedUser);
   } catch (error) {
-    console.error(error);
+    console.error('Registration error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 server.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
   try {
+    const { username, password } = req.body;
     const user = await User.findOne({ username });
 
-    if (!user) {
-      // If the user is not found, return an error response
-      return res.status(401).json({ error: 'User not found' });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      // Avoid revealing too much information about login failures
+      return res.status(401).json({ error: 'Authentication failed' });
     }
 
-    if (await bcrypt.compare(password, user.password)) {
-      // Passwords match, so login is successful
-      res.json({ message: 'Login successful' });
-    } else {
-      // Passwords do not match, return an error response
-      res.status(401).json({ error: 'Invalid credentials' });
-    }
+    res.json({ message: 'Login successful' });
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
