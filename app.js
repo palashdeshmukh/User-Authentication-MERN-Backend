@@ -1,14 +1,14 @@
 require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const cors = require('cors');
-const  bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const path   = require('path');
+const path = require('path');
 const server = express();
-const port = 8082;
-// const loginRoute = require('./routes/Login');
-// const registerRoute = require('./routes/Register');
+
+// Use the PORT environment variable provided by Render or default to 8082
+const port = process.env.PORT || 8082;
 
 server.use(cors());
 server.use(express.json());
@@ -17,8 +17,6 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
-
-
 
 const userSchema = new mongoose.Schema({
   username: String,
@@ -53,7 +51,6 @@ server.post('/register', async (req, res) => {
   }
 });
 
-
 server.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -78,8 +75,4 @@ server.post('/login', async (req, res) => {
   }
 });
 
-
-
 server.listen(port, () => console.log(`Server started at http://localhost:${port}`));
-
-module.exports = server;
