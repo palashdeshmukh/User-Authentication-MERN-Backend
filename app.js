@@ -6,8 +6,8 @@ const bcrypt = require('bcrypt');
 const path   = require('path');
 const server = express();
 const port = 8082;
-const loginRoute = require('./routes/Login');
-const registerRoute = require('./routes/Register');
+// const loginRoute = require('./routes/Login');
+// const registerRoute = require('./routes/Register');
 
 server.use(cors());
 server.use(express.json());
